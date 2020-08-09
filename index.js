@@ -1,25 +1,71 @@
+const API_URL = 'http://api.weatherstack.com/current?' // URL DE LA API DEL CLIMA
+const ACCESS_KEY = 'bd30917bddfb01ac021c66795d800f50' 
+
 var fondo =
 document.getElementById("body");
 var clima = '';
 
 //nachom aqui 
 //-------------------------------------
-const API_URL = 'http://api.weatherstack.com/current?'
-const ACCESS_KEY = 'bd30917bddfb01ac021c66795d800f50'
-const QUERY = 'Durazno'
 
-function success (data){
-    console.log(`El clima en ${QUERY} es: ${data.current.temperature} grados`)
-    console.log(`condicion del clima: ${data.current.weather_descriptions}`)
-    console.log(`velocidad del viento: ${data.current.wind_speed} km/h , direccion ${data.current.wind_dir}`)
+const success_city = async(data) => {
+    // console.log(`Latitude: ${data.coords.latitude}
+    // Longitude: ${data.coords.longitude}`);
+    var crd = data.coords; 
+    var lat = crd.latitude.toString(); 
+    var lng = crd.longitude.toString(); 
+    var coordenadas = [lat, lng];
+    const ciudad =  await obtenerCiudad(coordenadas)
+    obtenerClima(ciudad)
+}
+
+const obtenerCiudad = async(coordenadas) => {
+  return new Promise((resolve,reject) => {
+      var xhr = new XMLHttpRequest(); 
+      var lat = coordenadas[0]; 
+      var lng = coordenadas[1]; 
+  
+      xhr.open('GET', "https://us1.locationiq.com/v1/reverse.php?key=e55ac6c7a3ccbb&lat=" + lat + "&lon=" + lng + "&format=json", true); 
+      xhr.send(); 
+      xhr.addEventListener("readystatechange", obtengoCiudad, false);
+      
+      function obtengoCiudad (data) {
+          if (xhr.readyState == 4 && xhr.status == 200) { 
+              var response = JSON.parse(xhr.responseText); 
+              var city = response.address.city; 
+              resolve(city)
+          }
+          // else{
+          //      reject(new Error ('ERROR'))
+          // } 
+      }  
+  })
+}
+
+
+function success_wheather (data){
+    // console.log(`El clima en ${data.request.query} es: ${data.current.temperature} grados`)
+    // console.log(`condicion del clima: ${data.current.weather_descriptions}`)
+    // console.log(`velocidad del viento: ${data.current.wind_speed} km/h , direccion ${data.current.wind_dir}`)
  
     document.getElementById("grados").innerHTML = `${data.current.temperature}°C`;
-    document.getElementById("localizacion").innerHTML = `Localidad: ${QUERY}`;
+    document.getElementById("localizacion").innerHTML = `Localidad: ${data.request.query}`;
     document.getElementById("temperatura").innerHTML = `<b>La temperatura es:</b> ${data.current.temperature}`;
     document.getElementById("agua-descripcion").innerHTML = `<b>Descripción:</b> ${data.current.weather_descriptions}`;
     document.getElementById("viento-velocidad").innerHTML = `<b>Velocidad de viento:</b> ${data.current.wind_speed}`;
 }
-$.get(`${API_URL}access_key=${ACCESS_KEY}&query=${QUERY}`, {crossDomain: true}, success)
+
+function error(error){
+  console.error(error.message)
+}
+
+function obtenerClima(ciudad){
+  $
+  .get(`${API_URL}access_key=${ACCESS_KEY}&query=${ciudad}`, {crossDomain: true}, success_wheather)
+}
+  
+navigator.geolocation.getCurrentPosition(success_city, error)
+
 //-------------------------------------
 
 function laHora() {
@@ -28,9 +74,9 @@ function laHora() {
   var minuto = fecha.getMinutes();
   var segundo = fecha.getSeconds();
   
-  document.getElementById("reloj").innerHTML =
-  hora + 'h' + '-' + minuto + 'm' + '-' + segundo + 's';
-  console.log(hora,'-', minuto,'-', segundo);
+  document.getElementById("reloj").innerHTML = `${hora}h ${minuto}m ${segundo}s`
+  // hora + 'h' + '-' + minuto + 'm' + '-' + segundo + 's';
+  //console.log(hora,'-', minuto,'-', segundo);
   
   //---Establece color de fondo segun la hora---
   if ((hora > 7) & (hora < 18)) {//
