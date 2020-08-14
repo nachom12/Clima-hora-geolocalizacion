@@ -5,11 +5,11 @@ var fondo =
 document.getElementById("body");
 var clima = '';
 
-var options = {
-  enableHighAccuracy: true,
-  timeout: 10000,
-  maximumAge: 0
-}
+// var options = {
+//   enableHighAccuracy: true,
+//   timeout: 10000,
+//   maximumAge: 0
+// }
 
 //nachom aqui 
 //-------------------------------------
@@ -70,7 +70,7 @@ function obtenerClima(ciudad){
   .get(`${API_URL}access_key=${ACCESS_KEY}&query=${ciudad}`, {crossDomain: true}, success_wheather)
 }
   
-navigator.geolocation.getCurrentPosition(success_city, error, options)
+navigator.geolocation.getCurrentPosition(success_city, error)
 
 //-------------------------------------
 
